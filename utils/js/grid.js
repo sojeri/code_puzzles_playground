@@ -109,16 +109,18 @@ class NaiveGrid {
         return this.rows.map(row => row.map(this.#cellToStringCb).join('')).join('\n')
     }
 
+    /** returns true if given row/col is in grid bounds */
+    isCellInBounds(row, col) {
+        return row >= 0 && row < this.height && col >= 0 && col < this.width
+    }
+
     /** returns the cell value from the row and column specified */
     getCell(row, col, cellActionCb) {
-        if (row >= 0 && row < this.height) {
-            if (col >= 0 && col < this.width) {
-                const cell = this.rows[row][col]
-                if (cellActionCb !== undefined) {
-                    cellActionCb(row, col, cell)
-                }
-                return this.rows[row][col]
+        if (this.isCellInBounds(row, col)) {
+            if (cellActionCb !== undefined) {
+                cellActionCb(row, col, this.rows[row][col])
             }
+            return this.rows[row][col]
         }
 
         return this.nullCellValue
@@ -126,12 +128,10 @@ class NaiveGrid {
 
     /** sets the specified cell value or throws an out of bounds error */
     setCell(row, col, newCellValue, cellActionCb) {
-        if (row >= 0 && row < this.height) {
-            if (col >= 0 && col < this.width) {
-                this.getCell(row, col, cellActionCb)
-                this.rows[row][col] = newCellValue
-                return this.getCell(row, col)
-            }
+        if (this.isCellInBounds(row, col)) {
+            this.getCell(row, col, cellActionCb)
+            this.rows[row][col] = newCellValue
+            return this.getCell(row, col)
         }
 
         throw new Error(NaiveGridErrors.outOfBounds)
