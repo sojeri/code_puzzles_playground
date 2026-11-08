@@ -181,7 +181,12 @@ class NaiveGrid {
      * inspects every cell in semi-radial quadrant flow.
      * throws an error if required inspectCellCb is not a function.
      *
-     * eg, given quadrants
+     * the function will be called like:
+     * ```
+     * inspectCellCb(row, col, cell)
+     * ```
+     *
+     * re SEMI-RADIAL: given quadrants
      * ```
      * ---------
      * | 1 | 2 |
@@ -233,6 +238,11 @@ class NaiveGrid {
     /**
      * inspects every cell from top to bottom, left to right.
      * throws an error if required inspectCellCb is not a function.
+     *
+     * the function will be called like:
+     * ```
+     * inspectCellCb(row, col, cell)
+     * ```
      */
     traverse(inspectCellCb) {
         if (typeof inspectCellCb !== 'function') {

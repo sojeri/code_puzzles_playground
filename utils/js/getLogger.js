@@ -6,8 +6,49 @@ const VERBOSITY = {
     ERROR: 3,
 }
 
+/** props to https://en.wikipedia.org/wiki/ANSI_escape_code */
+const ANSI = {
+    /** must use before other commands to have them do anything */
+    BEGIN_INSTRUCTION: '\u001b[',
+    /** give # arg first if wanting to move multiple lines back */
+    GO_TO_PREVIOUS_LINE: 'F',
+}
+
+const animate = (frames, interval = 600) => {
+    try {
+        frames.length > 0
+        if (!Array.isArray(frames)) throw new Error('frames must be an array')
+        if (typeof frames[0] !== 'string')
+            throw new Error('individual frame must be a string')
+    } catch (e) {
+        throw new Error(
+            'frames passed to logger.animate were not compatible with animation',
+            e
+        )
+    }
+
+    const animationHeight = Array.from(frames[0].matchAll(/\n/g)).length
+    const prevLineMarker = `${ANSI.BEGIN_INSTRUCTION}${animationHeight}${ANSI.GO_TO_PREVIOUS_LINE}`
+    let currentFrame = 0
+    let finalFrame = frames.length - 1
+    const animation = setInterval(() => {
+        process.stdout.write(`${prevLineMarker}${frames[currentFrame]}`)
+        if (currentFrame === finalFrame) {
+            clearInterval(animation)
+            process.stdout.write('\n')
+        }
+        currentFrame++
+    }, interval)
+}
+
 const createLogger = (loggerName, verbosity) => {
     return {
+        /** requires @see VERBOSITY.INFO or lower */
+        animate: (frames, frameDisplayMs) => {
+            if (verbosity <= VERBOSITY.INFO) {
+                animate(frames, frameDisplayMs)
+            }
+        },
         info: (...args) => {
             if (verbosity <= VERBOSITY.INFO) {
                 console.log(loggerName, ...args)

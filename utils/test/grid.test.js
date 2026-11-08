@@ -52,80 +52,102 @@ describe('NaiveGrid', () => {
             assert.strictEqual(grid.toString(), 'h-e-l-l-o-\nw-o-r-l-d-')
         })
     })
-    describe('getCell()', () => {
-        it('should return the value at the specified cell', () => {
-            const grid = new NaiveGrid({
-                rawGrid: ['ABC', 'DEF', 'GHI'],
-            })
-            const first = grid.getCell(2, 2)
-            const second = grid.getCell(1, 0)
-            const third = grid.getCell(1, 1)
-            const fourth = grid.getCell(0, 0)
-            assert.strictEqual(first, 'I')
-            assert.strictEqual(second, 'D')
-            assert.strictEqual(third, 'E')
-            assert.strictEqual(fourth, 'A')
-        })
-        describe('out of bounds access', () => {
-            it('should return null for out of bounds grid.getCell', () => {
+    describe('single grid cell access', () => {
+        describe('isCellInBounds()', () => {
+            it('should return true for a cell that is within the grid', () => {
                 const grid = new NaiveGrid({
                     rawGrid: ['hello', 'world'],
                 })
-                assert.strictEqual(grid.getCell(75, -1), null)
+                assert.strictEqual(grid.isCellInBounds(0, 1), true)
+                assert.strictEqual(grid.isCellInBounds(0, 2), true)
+                assert.strictEqual(grid.isCellInBounds(0, 4), true)
+                assert.strictEqual(grid.isCellInBounds(1, 3), true)
             })
-            it('should return specified null cell value for out of bounds grid.getCell', () => {
+            it('should return false for a cell that is outside the grid', () => {
                 const grid = new NaiveGrid({
                     rawGrid: ['hello', 'world'],
-                    nullCellValue: 'placeholder value',
                 })
-                assert.deepEqual(grid.getCell(75, -1), 'placeholder value')
-            })
-            it('should NOT return the exact object null cell value for out of bounds grid.getCell', () => {
-                const exactObj = { value: -1 }
-                const grid = new NaiveGrid({
-                    rawGrid: ['hello', 'world'],
-                    nullCellValue: exactObj,
-                })
-                assert.deepEqual(grid.getCell(75, -1), exactObj)
-                assert.notStrictEqual(grid.getCell(75, -1), exactObj)
+                assert.strictEqual(grid.isCellInBounds(-1, -1), false)
+                assert.strictEqual(grid.isCellInBounds(0, 20), false)
+                assert.strictEqual(grid.isCellInBounds(20, 0), false)
+                assert.strictEqual(grid.isCellInBounds(20, 20), false)
             })
         })
-        describe('optional cellActionCb', () => {
-            it('takes an optional callback which can further inspect or modify cell data', () => {
+        describe('getCell()', () => {
+            it('should return the value at the specified cell', () => {
                 const grid = new NaiveGrid({
                     rawGrid: ['ABC', 'DEF', 'GHI'],
                 })
-                const cellBefore = grid.getCell(1, 1)
-                assert.strictEqual(cellBefore, 'E')
-
-                const modifyCellCb = (row, col, cell) => {
-                    grid.setCell(row, col, `${cell} is for elephant`)
-                }
-                const cellWithModifyCb = grid.getCell(1, 1, modifyCellCb)
-                assert.strictEqual(cellWithModifyCb, 'E is for elephant')
-
-                const permanentlyMutatedCell = grid.getCell(1, 1)
-                assert.strictEqual(permanentlyMutatedCell, 'E is for elephant')
+                const first = grid.getCell(2, 2)
+                const second = grid.getCell(1, 0)
+                const third = grid.getCell(1, 1)
+                const fourth = grid.getCell(0, 0)
+                assert.strictEqual(first, 'I')
+                assert.strictEqual(second, 'D')
+                assert.strictEqual(third, 'E')
+                assert.strictEqual(fourth, 'A')
             })
-        })
-    })
-    describe('setCell()', () => {
-        it('sets the specified cell value', () => {
-            const grid = new NaiveGrid({
-                rawGrid: ['123', '466', '789'],
-            })
-            assert.deepEqual(grid.getCell(1, 1), '6')
-
-            grid.setCell(1, 1, '5')
-            assert.deepEqual(grid.getCell(1, 1), '5')
-        })
-        describe('out of bounds access', () => {
-            it('should throw an error for out of bounds access', () => {
-                const grid = new NaiveGrid({
-                    rawGrid: ['123', '456', '789'],
+            describe('out of bounds access', () => {
+                it('should return null for out of bounds grid.getCell', () => {
+                    const grid = new NaiveGrid({
+                        rawGrid: ['hello', 'world'],
+                    })
+                    assert.strictEqual(grid.getCell(75, -1), null)
                 })
-                assert.throws(() => {
-                    grid.setCell(3, 0, '10')
+                it('should return specified null cell value for out of bounds grid.getCell', () => {
+                    const grid = new NaiveGrid({
+                        rawGrid: ['hello', 'world'],
+                        nullCellValue: 'placeholder value',
+                    })
+                    assert.deepEqual(grid.getCell(75, -1), 'placeholder value')
+                })
+                it('should NOT return the exact object null cell value for out of bounds grid.getCell', () => {
+                    const exactObj = { value: -1 }
+                    const grid = new NaiveGrid({
+                        rawGrid: ['hello', 'world'],
+                        nullCellValue: exactObj,
+                    })
+                    assert.deepEqual(grid.getCell(75, -1), exactObj)
+                    assert.notStrictEqual(grid.getCell(75, -1), exactObj)
+                })
+            })
+            describe('optional cellActionCb', () => {
+                it('takes an optional callback which can further inspect or modify cell data', () => {
+                    const grid = new NaiveGrid({
+                        rawGrid: ['ABC', 'DEF', 'GHI'],
+                    })
+                    const cellBefore = grid.getCell(1, 1)
+                    assert.strictEqual(cellBefore, 'E')
+
+                    const modifyCellCb = (row, col, cell) => {
+                        grid.setCell(row, col, `${cell} is for elephant`)
+                    }
+                    const cellWithModifyCb = grid.getCell(1, 1, modifyCellCb)
+                    assert.strictEqual(cellWithModifyCb, 'E is for elephant')
+
+                    const permanentlyMutatedCell = grid.getCell(1, 1)
+                    assert.strictEqual(permanentlyMutatedCell, 'E is for elephant')
+                })
+            })
+        })
+        describe('setCell()', () => {
+            it('sets the specified cell value', () => {
+                const grid = new NaiveGrid({
+                    rawGrid: ['123', '466', '789'],
+                })
+                assert.deepEqual(grid.getCell(1, 1), '6')
+
+                grid.setCell(1, 1, '5')
+                assert.deepEqual(grid.getCell(1, 1), '5')
+            })
+            describe('out of bounds access', () => {
+                it('should throw an error for out of bounds access', () => {
+                    const grid = new NaiveGrid({
+                        rawGrid: ['123', '456', '789'],
+                    })
+                    assert.throws(() => {
+                        grid.setCell(3, 0, '10')
+                    })
                 })
             })
         })
@@ -173,26 +195,44 @@ describe('NaiveGrid', () => {
             })
         })
     })
-    describe.skip('traversal methods', () => {
+    describe('traversal methods', () => {
         describe('traverse', () => {
-            it('throws an error if no inspectCellCb is provided', () => {
+            it('requies an inspectCellCb function', () => {
+                const grid = new NaiveGrid({ rawGrid: ['hello', 'world'] })
+                assert.doesNotThrow(() => {
+                    grid.traverse(() => {})
+                })
+                assert.throws(() => {
+                    grid.traverse()
+                })
+                assert.throws(() => {
+                    grid.traverse({ foo: 'bar' })
+                })
+            })
+            it.skip('traverses top to bottom, left to right', () => {
                 // TODO: implement!
             })
-            it('traverses top to bottom, left to right', () => {
-                // TODO: implement!
-            })
-            it('only visits each cell once per cycle', () => {
+            it.skip('only visits each cell once per cycle', () => {
                 // TODO: implement!
             })
         })
         describe('traverseSemiRadially', () => {
-            it('throws an error if no inspectCellCb is provided', () => {
+            it('throws an error if no inspectCellCb function is provided', () => {
+                const grid = new NaiveGrid({ rawGrid: ['hello', 'world'] })
+                assert.doesNotThrow(() => {
+                    grid.traverse(() => {})
+                })
+                assert.throws(() => {
+                    grid.traverse()
+                })
+                assert.throws(() => {
+                    grid.traverse({ foo: 'bar' })
+                })
+            })
+            it.skip('traverses quadrant by quadrant', () => {
                 // TODO: implement!
             })
-            it('traverses quadrant by quadrant', () => {
-                // TODO: implement!
-            })
-            it('only visits each cell once per cycle', () => {
+            it.skip('only visits each cell once per cycle', () => {
                 // TODO: implement!
             })
         })
