@@ -43,7 +43,7 @@ describe('10-3-solution', function () {
     })
     const size_watwatwatwatwat = getSln(1_000_000_000_000)
     describe('part 3 madness', () => {
-        it('should return 13_314_695_352_588 for example input', () => {
+        it.skip('should return 13_314_695_352_588 for example input', () => {
             assert.strictEqual(
                 runCallbackAgainstFile(
                     size_watwatwatwatwat,

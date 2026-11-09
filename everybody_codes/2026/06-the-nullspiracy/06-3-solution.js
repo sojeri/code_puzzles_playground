@@ -36,7 +36,6 @@ function hasTooManyNullLikeParts(name, allRecipes) {
 }
 
 function solution(recipeList) {
-    console.log('wwwaaat')
     const allRecipes = getAllRecipes(recipeList)
     logger.info('All Recipes:')
     logger.info({ ...allRecipes })

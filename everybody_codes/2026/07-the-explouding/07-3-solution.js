@@ -134,7 +134,7 @@ function getCloudEnergy(rawInnkeeerRecords, startId, startPulse, explodesAt) {
     }
 
     const cloudsReducer = (total, id) => total + clouds[id].energy
-    return clouds.allIds.reduce(cloudsReducer, 0)
+    return [...clouds.allIds].reduce(cloudsReducer, 0)
 }
 
 function getBestCloudPulse(rawInnkeeerRecords, maxSteps = 5, goesBoomAt = -1) {
